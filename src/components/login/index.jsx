@@ -1,10 +1,11 @@
 import React from 'react';
+import * as client from '../../xmpp/client';
 
 class LoginForm extends React.Component {
 
   constructor(props) {
     super(props);
-    
+
     this.state = {
       user: '',
       password: '',
@@ -34,7 +35,13 @@ class LoginForm extends React.Component {
             value={this.state.password}
             onChange={this.handlePassword}
           />
-          <button type="button" onClick={ (e) => console.log(this.state.user) }>Login</button>
+          <button type="button" onClick={ (e) => {
+            client.initialize(
+              this.state.user,
+              this.state.password,
+              client.onConnect,
+            );
+          } }>Login</button>
         </form>
       );
   }
