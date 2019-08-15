@@ -2,6 +2,10 @@ import slixmpp
 import argparse
 from user import User
 
+
+def algorithm():
+    print("h")
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='XMPP client.')
     parser.add_argument('-j', dest='jid', help='JID to use')
@@ -14,7 +18,14 @@ if __name__ == '__main__':
     if args.psw is None:
         args.psw = input('Password: ')
 
-    xmpp = User(jid=args.jid, password=args.psw)
+    xmpp = User(
+                jid=args.jid,
+                password=args.psw,
+                algorithm=algorithm,
+                DEBUG=True,
+                neighbors=[]
+            )
+
     xmpp.register_plugin('xep_0030')  # Service Discovery
     xmpp.register_plugin('xep_0004')  # Data forms
     xmpp.register_plugin('xep_0060')  # PubSub
