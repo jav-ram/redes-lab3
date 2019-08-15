@@ -3,7 +3,7 @@ from threading import Thread
 from slixmpp.exceptions import IqError, IqTimeout
 from menu import OptionsMenu
 from blessed import Terminal
-from parse import get_dict
+from parse import get_dict, make_msg_json
 import asyncio
 import random
 
@@ -21,7 +21,6 @@ class User(slixmpp.ClientXMPP):
         jid,
         password,
         algorithm,
-        transformation=make_json,
         DEBUG=False,
         neighbors=[],
     ):
@@ -32,7 +31,6 @@ class User(slixmpp.ClientXMPP):
         ))
 
         self.algorithm = algorithm
-        self.transformation = transformation
         self.DEBUG = DEBUG
         self.neighbors = neighbors
 
@@ -72,12 +70,13 @@ class User(slixmpp.ClientXMPP):
 
             if type == 'message':
                 # apply algorithm
-                for neighbor in self.neighbors:
-                    if self.algorithm()
+                pass
             elif type == 'connection':
                 # update neighbors
+                pass
             elif type == 'response':
                 # update neighbors
+                pass
 
             print(t.color(random.randint(9, 15))(t.bold(str(msg['from'])) + ': ' + str(msg['body'])))
         else:
@@ -88,7 +87,7 @@ class User(slixmpp.ClientXMPP):
     def send_individual_message(self):
         mto = input('Para: ')
         mbody = input('Contenido: ')
-        json_msg = self.transformation(to=mto, msg=mbody)
+        json_msg = make_msg_json(me=self.jid, to=mto, msg=mbody, hops=0, distance=0) # TODO: cambiar hops y distance
         self.send_message(mto=mto, mbody=json_msg)
 
 

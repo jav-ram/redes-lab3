@@ -9,7 +9,7 @@ def algorithm():
 
 def get_neighbors(cant):
     neighbors = []
-    if (cant < 0):
+    if (cant > 0):
         for i in range(0, cant):
             neighbors.append(input("Nombre del nodo vecino: "))
     return neighbors
@@ -26,7 +26,7 @@ if __name__ == '__main__':
     if args.psw is None:
         args.psw = input('Password: ')
 
-    cant = input("Cantidad de nodos vecinos: ")
+    cant = int(input("Cantidad de nodos vecinos: "))
     neighbors = get_neighbors(cant)
 
     xmpp = User(

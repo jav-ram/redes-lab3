@@ -5,7 +5,7 @@ def get_dict(str):
     return json.loads(str)
 
 
-def make_msg_json(me, to, msg, hops, distance, msg):
+def make_msg_json(me, to, msg, hops, distance):
     return json.dumps({
         'type': 'message',
         'from': me,
