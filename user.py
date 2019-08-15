@@ -3,7 +3,7 @@ from threading import Thread
 from slixmpp.exceptions import IqError, IqTimeout
 from menu import OptionsMenu
 from blessed import Terminal
-from algorithms import make_json
+from parse import get_dict
 import asyncio
 import random
 
@@ -66,7 +66,19 @@ class User(slixmpp.ClientXMPP):
 
     def message(self, msg):
         if msg['type'] in ('normal', 'chat'):
-            # Do something
+            # get type of message
+            json = get_dict(msg[body])
+            type = json['type']
+
+            if type == 'message':
+                # apply algorithm
+                for neighbor in self.neighbors:
+                    if self.algorithm()
+            elif type == 'connection':
+                # update neighbors
+            elif type == 'response':
+                # update neighbors
+
             print(t.color(random.randint(9, 15))(t.bold(str(msg['from'])) + ': ' + str(msg['body'])))
         else:
             # Error

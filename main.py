@@ -6,6 +6,14 @@ from user import User
 def algorithm():
     print("h")
 
+
+def get_neighbors(cant):
+    neighbors = []
+    if (cant < 0):
+        for i in range(0, cant):
+            neighbors.append(input("Nombre del nodo vecino: "))
+    return neighbors
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='XMPP client.')
     parser.add_argument('-j', dest='jid', help='JID to use')
@@ -18,12 +26,15 @@ if __name__ == '__main__':
     if args.psw is None:
         args.psw = input('Password: ')
 
+    cant = input("Cantidad de nodos vecinos: ")
+    neighbors = get_neighbors(cant)
+
     xmpp = User(
                 jid=args.jid,
                 password=args.psw,
                 algorithm=algorithm,
                 DEBUG=True,
-                neighbors=[]
+                neighbors=neighbors
             )
 
     xmpp.register_plugin('xep_0030')  # Service Discovery
