@@ -21,13 +21,30 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
+    """
     if args.jid is None:
-        args.jid = input('Username: ')
+        #args.jid = input('Username: ')
+        args.jid = "h@alumchat.xyz"
     if args.psw is None:
-        args.psw = input('Password: ')
+        #args.psw = input('Password: ')
+        args.psw = "hanu"
+    """
+    usuario = input("Usuario: ")
 
-    cant = int(input("Cantidad de nodos vecinos: "))
-    neighbors = get_neighbors(cant)
+    #cant = int(input("Cantidad de nodos vecinos: "))
+    #neighbors = get_neighbors(cant)
+    if (usuario == "n"):
+        args.jid = "nistal@alumchat.xyz"
+        args.psw = "nistal123"
+        neighbors = [args.jid,"rodriguez@alumchat.xyz"]
+    if (usuario == "r"):
+        args.jid = "rodriguez@alumchat.xyz"
+        args.psw = "rodriguez123"
+        neighbors = [args.jid,"ramos@alumchat.xyz","nistal@alumchat.xyz"]
+    if (usuario == "ra"):
+        args.jid = "ramos@alumchat.xyz"
+        args.psw = "ramos123"
+        neighbors = [args.jid,"rodriguez@alumchat.xyz"]
 
     xmpp = User(
                 jid=args.jid,
@@ -36,18 +53,6 @@ if __name__ == '__main__':
                 DEBUG=True,
                 neighbors=neighbors
             )
-
-    xmpp.register_plugin('xep_0030')  # Service Discovery
-    xmpp.register_plugin('xep_0004')  # Data forms
-    xmpp.register_plugin('xep_0060')  # PubSub
-    xmpp.register_plugin('xep_0065')  # File transfer
-    xmpp.register_plugin('xep_0199')  # XMPP Ping
-    xmpp.register_plugin('xep_0047')  # In-band Bytestreams
-    xmpp.register_plugin('xep_0066')  # Out-of-band Data
-    xmpp.register_plugin('xep_0077')  # Register
-    xmpp.register_plugin('xep_0065')  # SOCKS5 Bytestreams
-
-    xmpp.plugin['xep_0077'].force_registration = True
 
     xmpp.connect()
     xmpp.process(forever=False)
