@@ -76,18 +76,28 @@ class User(slixmpp.ClientXMPP):
 
     def message(self, msg):
         if msg['type'] in ('normal', 'chat'):
-            # imprimir lo que se recibe
-            print(t.color(random.randint(9, 15))(t.bold(str(msg['from'])) + ': ' + str(msg['body'])))
-            #parceo string to json
+            # parceo string to json
             message = get_dict(msg["body"])
             message_type = message['type']
             if message_type == 'message':
-                #para flooding
-                for neighbor in self.neighbors:
-                    #enviar a todos los vecinos que no sean el origen, que no sea el vecino que mando el ultimo menasje y que no sea el vecino que creo el mensaje
-                    if (self.me != neighbor and message['from'] != neighbor and message['origin'] != neighbor):
-                        json_msg = make_msg_json(origin=message['origin'], me=self.me, to="all", msg=message["msg"], hops=message['hops']+1)
-                        self.send_message(mto=neighbor, mbody=json_msg)
+                # para flooding
+                if message['to'] != self.jid:
+                    for neighbor in self.neighbors:
+                        # enviar a todos los vecinos que no sean el origen, que no sea el vecino que mando el ultimo menasje y que no sea el vecino que creo el mensaje
+                        if (
+                            self.me != neighbor and
+                            message['from'] != neighbor and
+                            message['origin'] != neighbor
+                        ):
+                            json_msg = make_msg_json(
+                                origin=message['origin'],
+                                me=self.me, to="all",
+                                msg=message["msg"],
+                                hops=message['hops']+1
+                            )
+                            self.send_message(mto=neighbor, mbody=json_msg)
+                else:
+                    print(message)
                         
                 # apply algorithm
                 pass
@@ -109,16 +119,23 @@ class User(slixmpp.ClientXMPP):
         print("2. agregar vecino")
         print("3. enviar mensaje")
         opcion = input("opcion:")
-        if(opcion == "3"):
-            #texto del mensaje
-            mbody = "test flooding"
+        if (opcion == "3"):
+            to = input("Para quien: ")
+            # texto del mensaje
+            mbody = input("Mensaje: ")
             for neighbor in self.neighbors:
-                #mandar a todos los vecinos que no sean yo
+                # mandar a todos los vecinos que no sean yo
                 if (self.me != neighbor):
-                    json_msg = make_msg_json(origin=self.jid, me=self.jid, to="all", msg=mbody) # TODO: cambiar hops y distance
+                    json_msg = make_msg_json(
+                        origin=self.jid,
+                        me=self.jid,
+                        to=to,
+                        msg=mbody,
+                        hops=0,
+                        distance=0,
+                    )  # TODO: cambiar hops y distance
                     self.send_message(mto=neighbor, mbody=json_msg)
-        
-        
+
 
 
 
