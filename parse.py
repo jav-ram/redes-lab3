@@ -17,6 +17,15 @@ def make_msg_json(origin, me, to, msg, hops=0, distance=0):
     })
 
 
+def make_neighbors_list(me, table):
+
+    return json.dumps({
+        'type': 'connection',
+        'from': me,
+        'table': table,
+    })
+
+
 def make_connection_json(me, distance):
     return json.dumps({
         'type': 'connection',
