@@ -1,8 +1,7 @@
 import slixmpp
 import argparse
-from user import User
+from user_flooding import UserFlooding
 from user_dvr import UserDVR
-
 
 def algorithm():
     print("h")
@@ -12,7 +11,9 @@ def get_neighbors(cant):
     neighbors = []
     if (cant > 0):
         for i in range(0, cant):
-            neighbors.append(input("Nombre del nodo vecino: "))
+            name = input("Nombre del nodo vecino: ")
+            distance = input("Distancia del nodo vecino: ")
+            neighbors.append((name,distance))
     return neighbors
 
 if __name__ == '__main__':
@@ -24,24 +25,23 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     usuario = input("Usuario: ")
-    network_size = input("Tamaño de la red: ")
 
     # cant = int(input("Cantidad de nodos vecinos: "))
     # neighbors = get_neighbors(cant)
     if (usuario == "n"):
         args.jid = "nistal@alumchat.xyz"
         args.psw = "nistal123"
-        neighbors = ["rodriguez@alumchat.xyz", "ramos@alumchat.xyz"]
+        neighbors = [("rodriguez@alumchat.xyz",2)]
         distance = [2, 7]
     if (usuario == "r"):
         args.jid = "rodriguez@alumchat.xyz"
         args.psw = "rodriguez123"
-        neighbors = ["ramos@alumchat.xyz", "nistal@alumchat.xyz"]
+        neighbors = [("ramos@alumchat.xyz",5), ("nistal@alumchat.xyz",4)]
         distance = [1, 2]
     if (usuario == "ra"):
         args.jid = "ramos@alumchat.xyz"
         args.psw = "ramos123"
-        neighbors = ["rodriguez@alumchat.xyz", "nistal@alumchat.xyz"]
+        neighbors = [("rodriguez@alumchat.xyz",2), ("nistal@alumchat.xyz",5)]
         distance = [1, 7]
 
     """ if args.jid is None:
@@ -50,20 +50,19 @@ if __name__ == '__main__':
         args.psw = input('Password: ') """
 
     if args.alg == 'flooding':
-        xmpp = User(
+        xmpp = UserFlooding(
                     jid=args.jid,
                     password=args.psw,
-                    algorithm=algorithm,
                     DEBUG=True,
                     neighbors=neighbors
                 )
     elif args.alg == 'dvr':
         # DVR client
+        network_size = input("Tamaño de la red: ")
         print(distance)
         xmpp = UserDVR(
                     jid=args.jid,
                     password=args.psw,
-                    algorithm=algorithm,
                     DEBUG=True,
                     neighbors=neighbors,
                     distance=distance,

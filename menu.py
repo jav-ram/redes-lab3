@@ -4,13 +4,15 @@ from blessed import Terminal
 
 t = Terminal()
 
+def handle_table(self):
+        print("handle_table flooding")
 
-def OptionsMenu(s_msg, s_table):
+def OptionsMenu():
     while True:
         o = input("Option: ")
         if o == 'msg':
-            s_msg()
+            send_individual_message()
         if o == 'table':
-            s_table()
+            handle_table()
 
     return

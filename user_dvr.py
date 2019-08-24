@@ -1,86 +1,36 @@
-import slixmpp
-import sys
+from my_xmpp_client import my_xmpp_client
 from threading import Thread
-from slixmpp.exceptions import IqError, IqTimeout
-from blessed import Terminal
-import asyncio
-import random
 from menu import OptionsMenu
-from parse import get_dict, make_msg_json, make_neighbors_list
+from parse import get_dict, make_neighbors_list
 
-t = Terminal()
-
-
-def msg_group(msg):
-    print(t.color(40)(msg))
-
-
-class UserDVR(slixmpp.ClientXMPP):
+class UserDVR(my_xmpp_client):
 
     def __init__(
         self,
         jid,
         password,
-        algorithm,
         DEBUG=False,
         neighbors=[],
         distance=[],
         network_size=0,
     ):
-        super().__init__(jid, password)
+        super().__init__(jid, password, DEBUG, neighbors)
 
-        self.register_plugin('xep_0030')  # Service Discovery
-        self.register_plugin('xep_0004')  # Data forms
-        self.register_plugin('xep_0060')  # PubSub
-        self.register_plugin('xep_0065')  # File transfer
-        self.register_plugin('xep_0199')  # XMPP Ping
-        self.register_plugin('xep_0047')  # In-band Bytestreams
-        self.register_plugin('xep_0066')  # Out-of-band Data
-        self.register_plugin('xep_0077')  # Register
-        self.register_plugin('xep_0065')  # SOCKS5 Bytestreams
-        self.plugin['xep_0077'].force_registration = True
-
+        """
         self.menu = Thread(target=OptionsMenu, args=(
             self.send_individual_message,
             self.connection,
         ))
+        """
 
-        self.algorithm = algorithm
-        self.DEBUG = DEBUG
-        self.neighbors = neighbors
-        self.me = jid
         self.distance = distance
         self.network_size = network_size
         self.table = {}
 
-        # start event
-        self.add_event_handler('session_start', self.start)
-        # register event
-        self.add_event_handler('register', self.register)
         # message event
-        self.add_event_handler('message', self.message)
+        self.add_event_handler('message', self.receive_message_dvr)
 
-    def start(self, event):
-        self.send_presence()
-        self.get_roster()
-        self.menu.start()  # Start while
-
-    async def register(self, iq):
-        resp = self.Iq()
-        resp['type'] = 'set'
-        resp['register']['username'] = self.boundjid.user
-        resp['register']['password'] = self.password
-
-        try:
-            await resp.send()
-            print("Account created")
-        except IqError:
-            print("Error al crear cuenta, probablemente ya existe")
-        except IqTimeout:
-            print("timeout")
-            self.disconnect()
-
-    def message(self, msg):
+    def receive_message_dvr(self, msg):
         if msg['type'] in ('normal', 'chat'):
             # parceo string to json
             message = get_dict(msg["body"])
@@ -120,30 +70,6 @@ class UserDVR(slixmpp.ClientXMPP):
             # Error
             print('Error')
             print(msg['body'])
-
-    def send_individual_message(self):
-        print(self.neighbors)
-        print(self.boundjid.user)
-        print("1. mostrar tabla")
-        print("2. agregar vecino")
-        print("3. enviar mensaje")
-        opcion = input("opcion:")
-        if (opcion == "3"):
-            to = input("Para quien: ")
-            # texto del mensaje
-            mbody = input("Mensaje: ")
-            for neighbor in self.neighbors:
-                # mandar a todos los vecinos que no sean yo
-                if (self.me != neighbor):
-                    json_msg = make_msg_json(
-                        origin=self.jid,
-                        me=self.jid,
-                        to=to,
-                        msg=mbody,
-                        hops=0,
-                        distance=0,
-                    )  # TODO: cambiar hops y distance
-                    self.send_message(mto=neighbor, mbody=json_msg)
 
     def connection(self):
         # SEND AND ASK for NEIGHBORS
