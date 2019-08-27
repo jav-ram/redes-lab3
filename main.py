@@ -3,6 +3,7 @@ import argparse
 from user_flooding import UserFlooding
 from user_dvr import UserDVR
 
+
 def algorithm():
     print("h")
 
@@ -13,7 +14,7 @@ def get_neighbors(cant):
         for i in range(0, cant):
             name = input("Nombre del nodo vecino: ")
             distance = input("Distancia del nodo vecino: ")
-            neighbors.append((name,distance))
+            neighbors.append((name, distance))
     return neighbors
 
 if __name__ == '__main__':
@@ -31,18 +32,15 @@ if __name__ == '__main__':
     if (usuario == "n"):
         args.jid = "nistal@alumchat.xyz"
         args.psw = "nistal123"
-        neighbors = [("rodriguez@alumchat.xyz",2)]
-        distance = [2, 7]
+        neighbors = [("rodriguez@alumchat.xyz", 2), ("ramos@alumchat.xyz", 7)]
     if (usuario == "r"):
         args.jid = "rodriguez@alumchat.xyz"
         args.psw = "rodriguez123"
-        neighbors = [("ramos@alumchat.xyz",5), ("nistal@alumchat.xyz",4)]
-        distance = [1, 2]
+        neighbors = [("ramos@alumchat.xyz", 1), ("nistal@alumchat.xyz", 2)]
     if (usuario == "ra"):
         args.jid = "ramos@alumchat.xyz"
         args.psw = "ramos123"
-        neighbors = [("rodriguez@alumchat.xyz",2), ("nistal@alumchat.xyz",5)]
-        distance = [1, 7]
+        neighbors = [("rodriguez@alumchat.xyz", 1), ("nistal@alumchat.xyz", 7)]
 
     """ if args.jid is None:
         args.jid = input('Username: ')
@@ -59,13 +57,11 @@ if __name__ == '__main__':
     elif args.alg == 'dvr':
         # DVR client
         network_size = input("Tamaño de la red: ")
-        print(distance)
         xmpp = UserDVR(
                     jid=args.jid,
                     password=args.psw,
                     DEBUG=True,
                     neighbors=neighbors,
-                    distance=distance,
                 )
     elif args.alg == '':
         # OTRO

@@ -1,7 +1,11 @@
 from my_xmpp_client import my_xmpp_client
 from threading import Thread
 from menu import OptionsMenu
-from parse import get_dict, make_neighbors_list
+from parse import get_dict, make_neighbors_list, make_msg_json
+from graph import Graph, dijsktra
+
+INFINIT = 100000
+
 
 class UserDVR(my_xmpp_client):
 
@@ -11,21 +15,18 @@ class UserDVR(my_xmpp_client):
         password,
         DEBUG=False,
         neighbors=[],
-        distance=[],
         network_size=0,
     ):
-        super().__init__(jid, password, DEBUG, neighbors)
-
-        """
+        super().__init__(jid, password, DEBUG, neighbors)      
         self.menu = Thread(target=OptionsMenu, args=(
             self.send_individual_message,
             self.connection,
         ))
-        """
 
-        self.distance = distance
         self.network_size = network_size
-        self.table = {}
+        self.table = {
+            self.jid: neighbors
+        }
 
         # message event
         self.add_event_handler('message', self.receive_message_dvr)
@@ -35,10 +36,33 @@ class UserDVR(my_xmpp_client):
             # parceo string to json
             message = get_dict(msg["body"])
             message_type = message['type']
+            message_from = message['from']
+
             if message_type == 'message':
-                # para flooding
+                message_to = message['to']
                 if message['to'] != self.jid:
-                    pass
+                    # get closest neighbor
+                    options = []
+                    for node in self.table:
+                        # find
+                        for n in self.table[node]:
+                            if n[0] == message["to"]:
+                                options.append({
+                                    path: node,
+                                    distance: n[1]
+                                })
+                    
+                    closest = {
+                        path: "",
+                        distance: 100000,
+                    }
+                    for o in options:
+                        if o["distance"] < closest["distance"]:
+                            closest = o
+                    
+                    # send message
+                    
+
                 else:
                     print(message)
             elif message_type == 'connection':
@@ -48,24 +72,59 @@ class UserDVR(my_xmpp_client):
                 for n in nodes:
                     if n not in self.table:
                         changes = True
-                        self.table.append(n)
-                    else:
-                        index = self.table.index(n)
-                        if n.distance < self.table[index].distance:
-                            changes = True
-                            self.table[index].distance = n.distance
+                        self.table[message_from] = nodes[n]
+                    elif len(nodes[n]) > len(self.table[n]):
+                        changes = True
+                        self.table[message_from] = nodes[n]
+
+                # fill empties
+                for node in self.table:
+                    if node != self.jid:
+                        i = 0
+                        for their_neighbor in self.table[node]:
+                            for my_neighbor in self.table[self.jid]:
+                                if their_neighbor[0] == my_neighbor[0]:
+                                    i = i + 1
+
+                            if i == 0 and their_neighbor[0] != self.jid:
+                                changes = True
+                                self.table[self.jid].append(
+                                    (their_neighbor[0], None)
+                                )
+
+                # fill distance
+                # generate graph
+                # (nodeA, nodeB, distance)
+                graph = Graph()
+                edges = []
+                for node in self.table:
+                    for connection in self.table[node]:
+                        if connection[1] is not None:
+                            edges.append((node, connection[0], connection[1]))
+                
+                for edge in edges:
+                    graph.add_edge(*edge)
+
+                # apply to everyone
+                for index, neighbor in enumerate(self.table[self.jid]):
+                    name = neighbor[0]
+                    path = dijsktra(graph, self.jid, name)
+                    distance = 0
+                    for i in range(1, len(path)):
+                        previus = self.table[path[i - 1]]
+                        for p in previus:
+                            if p[0] == path[i]:
+                                distance = distance + p[1]
+                    if distance < neighbor[1]:
+                        self.table[self.jid][index] = (path[i], distance)
 
                 if changes:
-                    connection_msg = make_neighbors_list(
+                    connection_msg = make(
                         self.jid,
                         self.table
                     )
                     for n in self.neighbors:
-                        self.send_message(mto=n, mbody=connection_msg)
-
-            elif message_type == 'response':
-                # update neighbors
-                pass
+                        self.send_message(mto=n[0], mbody=connection_msg)
         else:
             # Error
             print('Error')
@@ -73,19 +132,10 @@ class UserDVR(my_xmpp_client):
 
     def connection(self):
         # SEND AND ASK for NEIGHBORS
-        # send
-        table = []
-        for i in range(0, len(self.neighbors)):
-            table.append({
-                "from": self.jid,
-                "to": self.neighbors[i],
-                "distance": self.distance[i],
-            })
-        self.table = table
+        # sen   d
         connection_msg = make_neighbors_list(
             self.jid,
             self.table
         )
-        print(self.table)
         for n in self.neighbors:
-            self.send_message(mto=n, mbody=connection_msg)
+            self.send_message(mto=n[0], mbody=connection_msg)

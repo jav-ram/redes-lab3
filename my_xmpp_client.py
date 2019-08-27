@@ -4,6 +4,7 @@ from threading import Thread
 from slixmpp.exceptions import IqError, IqTimeout
 from parse import make_msg_json
 
+
 class my_xmpp_client(slixmpp.ClientXMPP):
     def __init__(
         self,
