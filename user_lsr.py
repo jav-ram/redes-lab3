@@ -41,7 +41,7 @@ class UserLSR(slixmpp.ClientXMPP):
         ))
 
         self.DEBUG = DEBUG
-        self.neighbors = list(map(lambda x: x[0], neighbors))
+        self.neighbors = neighbors
         self.me = jid
         self.table = {}
         self.graph = nx.Graph()
@@ -54,7 +54,7 @@ class UserLSR(slixmpp.ClientXMPP):
         self.add_event_handler('message', self.message)
 
     def send_neighbors(self):
-        for neighbor in self.neighbors:
+        for neighbor, distance in self.neighbors:
             time.sleep(3)
             connection_msg = make_neighbors_list(
                 self.jid, self.neighbors, hops=1)
@@ -100,23 +100,24 @@ class UserLSR(slixmpp.ClientXMPP):
                     s_path = nx.shortest_path(self.graph, self.jid, to)
                     message['hops'] = hops + 1
                     message['from'] = self.jid
+                    message['distance'] = message['distance'] + \
+                        self.get_neighbor_distance(s_path[1])
                     self.send_message(mto=s_path[1], mbody=json.dumps(message))
 
             elif message_type == 'connection':
                 table = message['table']
-                if sender in self.neighbors:
+                if sender in list(map(lambda x: x[0], self.neighbors)):
                     hops = 1
                 if not self.has_same_table_entry(sender, table, hops):
                     self.add_table_entry(sender, table, hops)
                     print(self.table)
-                    for neighbor in self.neighbors:
+                    for neighbor, distance in self.neighbors:
                         if sender != neighbor:
                             connection_msg = make_neighbors_list(
                                 sender, table, hops=message['hops'] + 1)
                             self.send_message(
                                 mto=neighbor, mbody=connection_msg)
                     self.send_neighbors()
-                # update neighbors
 
             elif message_type == 'response':
                 pass
@@ -127,17 +128,17 @@ class UserLSR(slixmpp.ClientXMPP):
 
     def add_table_entry(self, node_jid, neighbors, distance):
         self.table[node_jid] = {
-            'neighbors': neighbors, 'distance': distance}
+            'neighbors': neighbors, 'hops': distance}
         new_graph = nx.Graph()
         for key, value in self.table.items():
             for neighbor in value['neighbors']:
-                new_graph.add_edge(key, neighbor)
+                new_graph.add_edge(key, neighbor[0], weight=neighbor[1])
         self.graph = new_graph
 
     def has_same_table_entry(self, node_jid, neighbors, distance):
         if node_jid in list(self.table.keys()):
             entry = self.table[node_jid]
-            if entry['neighbors'] == neighbors and distance <= entry['distance']:
+            if entry['neighbors'] == neighbors and distance <= entry['hops']:
                 return True
 
         return False
@@ -145,6 +146,10 @@ class UserLSR(slixmpp.ClientXMPP):
     def show_graph(self):
         nx.draw(self.graph, with_labels=True)
         plt.show()
+
+    def get_neighbor_distance(self, neighbor):
+        index = list(map(lambda x: x[0], self.neighbors)).index(neighbor)
+        return self.neighbors[index][1]
 
     def send_individual_message(self):
         to = input('Para quien: ')
@@ -156,6 +161,6 @@ class UserLSR(slixmpp.ClientXMPP):
             to=to,
             msg=mbody,
             hops=1,
-            distance=0,
+            distance=self.get_neighbor_distance(s_path[1]),
         )
         self.send_message(mto=s_path[1], mbody=json_msg)
