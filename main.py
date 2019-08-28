@@ -14,8 +14,8 @@ def get_neighbors(cant):
     if (cant > 0):
         for i in range(0, cant):
             name = input("Nombre del nodo vecino: ")
-            distance = input("Distancia del nodo vecino: ")
-            neighbors.append((name, distance))
+            distance = int(input("Distancia del nodo vecino: "))
+            neighbors.append((name + "@alumchat.xyz", distance))
     return neighbors
 
 
@@ -27,27 +27,28 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    usuario = input("Usuario: ")
-
-    # cant = int(input("Cantidad de nodos vecinos: "))
-    # neighbors = get_neighbors(cant)
-    if (usuario == "n"):
-        args.jid = "ja@alumchat.xyz"
-        args.psw = "nistal123"
-        neighbors = [("jb@alumchat.xyz", 2), ("jc@alumchat.xyz", 7)]
-    if (usuario == "r"):
-        args.jid = "jb@alumchat.xyz"
-        args.psw = "rodriguez123"
-        neighbors = [("jc@alumchat.xyz", 1), ("ja@alumchat.xyz", 2)]
-    if (usuario == "ra"):
-        args.jid = "jc@alumchat.xyz"
-        args.psw = "ramos123"
-        neighbors = [("jb@alumchat.xyz", 1), ("ja@alumchat.xyz", 7)]
-
-    """ if args.jid is None:
-        args.jid = input('Username: ')
+    if args.jid is None:
+        args.jid = input('Username: ') + "@alumchat.xyz"
     if args.psw is None:
-        args.psw = input('Password: ') """
+        args.psw = input('Password: ')
+
+    cant = int(input("Cantidad de nodos vecinos: "))
+    neighbors = get_neighbors(cant)
+    print(neighbors)
+
+    # if (usuario == "n"):
+    #     args.jid = "ja@alumchat.xyz"
+    #     args.psw = "nistal123"
+    #     neighbors = [("jb@alumchat.xyz", 2), ("jc@alumchat.xyz", 7)]
+    # if (usuario == "r"):
+    #     args.jid = "jb@alumchat.xyz"
+    #     args.psw = "rodriguez123"
+    #     neighbors = [("jc@alumchat.xyz", 1), ("ja@alumchat.xyz", 2)]
+    # if (usuario == "ra"):
+    #     args.jid = "jc@alumchat.xyz"
+    #     args.psw = "ramos123"
+    #     neighbors = [("jb@alumchat.xyz", 1), ("ja@alumchat.xyz", 7)]
+
 
     if args.alg == 'flooding':
         xmpp = UserFlooding(
@@ -58,7 +59,6 @@ if __name__ == '__main__':
         )
     elif args.alg == 'dvr':
         # DVR client
-        network_size = input("Tamaño de la red: ")
         xmpp = UserDVR(
             jid=args.jid,
             password=args.psw,
