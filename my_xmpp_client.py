@@ -77,8 +77,6 @@ class my_xmpp_client(slixmpp.ClientXMPP):
             hops=hops,
             distance=distance
         )
-        print("msbody")
-        print(json_msg)
         self.send_message(mto=closest, mbody=json_msg)
 
     def handle_menu(self):
