@@ -17,9 +17,9 @@ class UserDVR(my_xmpp_client):
         neighbors=[],
         network_size=0,
     ):
-        super().__init__(jid, password, DEBUG, neighbors)      
+        super().__init__(jid, password, DEBUG, neighbors)
         self.menu = Thread(target=OptionsMenu, args=(
-            self.send_individual_message,
+            self.send_message_custom,
             self.connection,
         ))
 
@@ -41,27 +41,19 @@ class UserDVR(my_xmpp_client):
             if message_type == 'message':
                 message_to = message['to']
                 if message['to'] != self.jid:
-                    # get closest neighbor
-                    options = []
-                    for node in self.table:
-                        # find
-                        for n in self.table[node]:
-                            if n[0] == message["to"]:
-                                options.append({
-                                    path: node,
-                                    distance: n[1]
-                                })
-                    
-                    closest = {
-                        path: "",
-                        distance: 100000,
-                    }
-                    for o in options:
-                        if o["distance"] < closest["distance"]:
-                            closest = o
-                    
+                    closest = self.get_closest(message_to)
+                    print('--------------------------------------------')
+                    print(closest)
+                    print('--------------------------------------------')
                     # send message
-                    
+                    self.send_individual_message(
+                        message_to,
+                        message['msg'],
+                        message['hops'] + 1,
+                        message['origin'],
+                        closest['path'],
+                        closest['distance'] + message['distance']
+                    )
 
                 else:
                     print(message)
@@ -101,7 +93,7 @@ class UserDVR(my_xmpp_client):
                     for connection in self.table[node]:
                         if connection[1] is not None:
                             edges.append((node, connection[0], connection[1]))
-                
+
                 for edge in edges:
                     graph.add_edge(*edge)
 
@@ -118,7 +110,7 @@ class UserDVR(my_xmpp_client):
                     if distance < neighbor[1]:
                         self.table[self.jid][index] = (path[i], distance)
 
-                if changes:
+                if True:
                     connection_msg = make(
                         self.jid,
                         self.table
@@ -129,6 +121,59 @@ class UserDVR(my_xmpp_client):
             # Error
             print('Error')
             print(msg['body'])
+
+    def get_closest(self, target):
+        print(self.table)
+        # is neighbor
+        # get closest neighbor
+        options = []
+        for node in self.table:
+            # find
+            for n in self.table[node]:
+                if n[0] == target:
+                    options.append({
+                        'path': node,
+                        'distance': n[1]
+                    })
+
+        closest = {
+            'path': "",
+            'distance': 100000,
+        }
+
+        print("Options")
+        for o in options:
+            if o["distance"] < closest["distance"]:
+                closest = o
+
+        print(options)
+        print(closest)
+
+        if closest['path'] == self.jid:
+            closest = {
+                'path': target,
+                'distance': 0,
+            }
+
+        print(closest)
+
+        return closest
+
+    def send_message_custom(self):
+        to = input("to: ")
+        msg = input("mensaje: ")
+
+        closest = self.get_closest(to)
+        print(closest)
+
+        self.send_individual_message(
+            to,
+            msg,
+            1,
+            self.jid,
+            closest['path'],
+            closest['distance']
+        )
 
     def connection(self):
         # SEND AND ASK for NEIGHBORS

@@ -32,17 +32,17 @@ if __name__ == '__main__':
     # cant = int(input("Cantidad de nodos vecinos: "))
     # neighbors = get_neighbors(cant)
     if (usuario == "n"):
-        args.jid = "nistal@alumchat.xyz"
+        args.jid = "ja@alumchat.xyz"
         args.psw = "nistal123"
-        neighbors = [("ramos@alumchat.xyz", 7)]
+        neighbors = [("jb@alumchat.xyz", 2), ("jc@alumchat.xyz", 7)]
     if (usuario == "r"):
-        args.jid = "rodriguez@alumchat.xyz"
+        args.jid = "jb@alumchat.xyz"
         args.psw = "rodriguez123"
-        neighbors = [("ramos@alumchat.xyz", 1)]
+        neighbors = [("jc@alumchat.xyz", 1), ("ja@alumchat.xyz", 2)]
     if (usuario == "ra"):
-        args.jid = "ramos@alumchat.xyz"
+        args.jid = "jc@alumchat.xyz"
         args.psw = "ramos123"
-        neighbors = [("rodriguez@alumchat.xyz", 1), ("nistal@alumchat.xyz", 7)]
+        neighbors = [("jb@alumchat.xyz", 1), ("ja@alumchat.xyz", 7)]
 
     """ if args.jid is None:
         args.jid = input('Username: ')

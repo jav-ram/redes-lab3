@@ -56,19 +56,30 @@ class my_xmpp_client(slixmpp.ClientXMPP):
             print("timeout")
             self.disconnect()
     
-    def send_individual_message(self, neighbor, message, hops, origin):
-        print("enviando mensaje", neighbor[0], neighbor[1])
-        time.sleep(neighbor[1])
-        print("mensaje enviado", neighbor[0], neighbor[1])
+    def send_individual_message(
+        self,
+        neighbor,
+        message,
+        hops,
+        origin,
+        closest,
+        distance
+    ):
+        print("enviando mensaje", closest, distance)
+        # time.sleep(0)
+        # este tiene que estar solo en el flooding
+        print("mensaje enviado", closest, distance)
         json_msg = make_msg_json(
             origin=origin,
             me=self.jid,
-            to=neighbor[0],
+            to=neighbor,
             msg=message,
             hops=hops,
-            distance=neighbor[1],
+            distance=distance
         )
-        self.send_message(mto=neighbor[0], mbody=json_msg)
+        print("msbody")
+        print(json_msg)
+        self.send_message(mto=closest, mbody=json_msg)
 
     def handle_menu(self):
         print(self.neighbors)
