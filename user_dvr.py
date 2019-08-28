@@ -42,9 +42,6 @@ class UserDVR(my_xmpp_client):
                 message_to = message['to']
                 if message['to'] != self.jid:
                     closest = self.get_closest(message_to)
-                    print('--------------------------------------------')
-                    print(closest)
-                    print('--------------------------------------------')
                     # send message
                     self.send_individual_message(
                         message_to,
@@ -123,7 +120,6 @@ class UserDVR(my_xmpp_client):
             print(msg['body'])
 
     def get_closest(self, target):
-        print(self.table)
         # is neighbor
         # get closest neighbor
         options = []
@@ -141,21 +137,15 @@ class UserDVR(my_xmpp_client):
             'distance': 100000,
         }
 
-        print("Options")
         for o in options:
             if o["distance"] < closest["distance"]:
                 closest = o
-
-        print(options)
-        print(closest)
 
         if closest['path'] == self.jid:
             closest = {
                 'path': target,
                 'distance': 0,
             }
-
-        print(closest)
 
         return closest
 
@@ -164,7 +154,6 @@ class UserDVR(my_xmpp_client):
         msg = input("mensaje: ")
 
         closest = self.get_closest(to)
-        print(closest)
 
         self.send_individual_message(
             to,
