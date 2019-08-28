@@ -1,8 +1,5 @@
 import threading
 import time
-from blessed import Terminal
-
-t = Terminal()
 
 
 def handle_table(self):

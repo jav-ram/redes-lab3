@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import sys
 from threading import Thread
 from slixmpp.exceptions import IqError, IqTimeout
-from blessed import Terminal
 import asyncio
 import random
 import time
