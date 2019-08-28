@@ -38,7 +38,7 @@ class UserFlooding(my_xmpp_client):
                             message['origin'] != neighbor[0] and 
                             message['hops'] != 0
                         ):
-                            self.send_individual_message(message['to'],message["msg"],message['hops']-1,message['origin'],neighbor)
+                            self.send_individual_message(message['to'],message["msg"],message['hops']-1,message['origin'],neighbor[0],neighbor[1])
                         
                 else:
                     print(message)
