@@ -96,5 +96,5 @@ class my_xmpp_client(slixmpp.ClientXMPP):
             for neighbor in self.neighbors:
                 # mandar a todos los vecinos que no sean yo
                 if (self.jid != neighbor[0]):
-                    self.send_individual_message(neighbor, mbody, 50, self.jid)
+                    self.send_individual_message(to, mbody, 50, self.jid, neighbor[0], neighbor[1])
                     
