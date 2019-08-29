@@ -4,7 +4,6 @@ astroid==2.2.5
 async-timeout==3.0.1
 attrs==19.1.0
 autopep8==1.4.4
-blessed==1.15.0
 cffi==1.12.3
 chardet==3.0.4
 cycler==0.10.0
