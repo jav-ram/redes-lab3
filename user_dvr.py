@@ -142,9 +142,14 @@ class UserDVR(my_xmpp_client):
                 closest = o
 
         if closest['path'] == self.jid:
+            d = 0
+            for n in self.neighbors:
+                if n[0] == target:
+                    d = n[1]
+                    break
             closest = {
                 'path': target,
-                'distance': 0,
+                'distance': d,
             }
 
         return closest
