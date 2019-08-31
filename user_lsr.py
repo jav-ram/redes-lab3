@@ -1,4 +1,5 @@
 import slixmpp
+from slixmpp.xmlstream.xmlstream import NotConnectedError
 import networkx as nx
 import matplotlib.pyplot as plt
 import sys
@@ -10,6 +11,13 @@ import time
 import json
 from menu import OptionsMenu
 from parse import get_dict, make_msg_json, make_neighbors_list, make_connection_json
+
+
+def neighbors_loop(send_neighbors):
+    time.sleep(3)
+    while True:
+        send_neighbors()
+        time.sleep(3)
 
 
 class UserLSR(slixmpp.ClientXMPP):
@@ -39,6 +47,10 @@ class UserLSR(slixmpp.ClientXMPP):
             self.show_graph,
         ))
 
+        self.neighbors_thread = Thread(target=neighbors_loop, args=(
+            self.send_neighbors,
+        ))
+
         self.DEBUG = DEBUG
         self.neighbors = neighbors
         self.me = jid
@@ -47,6 +59,7 @@ class UserLSR(slixmpp.ClientXMPP):
 
         # start event
         self.add_event_handler('session_start', self.start)
+        self.add_event_handler('session_start', self.send_neighbors)
         # register event
         self.add_event_handler('register', self.register)
         # message event
@@ -54,18 +67,17 @@ class UserLSR(slixmpp.ClientXMPP):
 
     def send_neighbors(self):
         for neighbor, distance in self.neighbors:
-            time.sleep(3)
             connection_msg = make_neighbors_list(
                 self.jid, self.neighbors, hops=1)
-            self.send_message(mto=neighbor, mbody=connection_msg)
-
-    def send_message_to_neighbor(self, neighbor, mbody):
-        self.send_message(mto=neighbor, mbody=connection_msg)
+            try:
+                self.send_message(mto=neighbor, mbody=connection_msg)
+            except:
+                pass
 
     def start(self, event):
         self.send_presence()
         self.get_roster()
-        self.send_neighbors()
+        self.neighbors_thread.start()
         self.menu.start()  # Start while
 
     async def register(self, iq):
@@ -94,7 +106,7 @@ class UserLSR(slixmpp.ClientXMPP):
             if message_type == 'message':
                 to = message['to']
                 if to == self.jid:
-                    print("Message Recieved: ", message)
+                    print("\nMessage Recieved: ", message)
                 else:
                     s_path = nx.shortest_path(self.graph, self.jid, to)
                     message['hops'] = hops + 1
@@ -109,14 +121,13 @@ class UserLSR(slixmpp.ClientXMPP):
                     hops = 1
                 if not self.has_same_table_entry(sender, table, hops):
                     self.add_table_entry(sender, table, hops)
-                    print(self.table)
+                    # print("\nNumero de nodos: ", self.graph.number_of_nodes())
                     for neighbor, distance in self.neighbors:
                         if sender != neighbor:
                             connection_msg = make_neighbors_list(
                                 sender, table, hops=message['hops'] + 1)
                             self.send_message(
                                 mto=neighbor, mbody=connection_msg)
-                    self.send_neighbors()
 
             elif message_type == 'response':
                 pass
