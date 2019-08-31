@@ -66,8 +66,7 @@ class my_xmpp_client(slixmpp.ClientXMPP):
         distance
     ):
         print("enviando mensaje", closest, distance)
-        # time.sleep(0)
-        # este tiene que estar solo en el flooding
+        #time.sleep(distance)
         print("mensaje enviado", closest, distance)
         json_msg = make_msg_json(
             origin=origin,
@@ -87,8 +86,8 @@ class my_xmpp_client(slixmpp.ClientXMPP):
         opcion = input("opcion:")
         if (opcion == "1"):
             name = input("Nombre del nodo vecino: ")
-            distance = input("Distancia del nodo vecino: ")
-            self.neighbors.append((name, distance))
+            distance = int(input("Distancia del nodo vecino: "))
+            self.neighbors.append((name + "@alumchat.xyz", distance))
         if (opcion == "2"):
             to = input("Para quien: ")
             # texto del mensaje
@@ -96,5 +95,5 @@ class my_xmpp_client(slixmpp.ClientXMPP):
             for neighbor in self.neighbors:
                 # mandar a todos los vecinos que no sean yo
                 if (self.jid != neighbor[0]):
-                    self.send_individual_message(to, mbody, 50, self.jid, neighbor[0], neighbor[1])
+                    self.send_individual_message(to + "@alumchat.xyz", mbody, 50, self.jid, neighbor[0], neighbor[1])
                     
