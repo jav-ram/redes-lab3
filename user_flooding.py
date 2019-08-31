@@ -19,19 +19,18 @@ class UserFlooding(my_xmpp_client):
     def receive_message_flooding(self, msg):
         if msg['type'] in ('normal', 'chat'):
             # parceo string to json
-            print(msg["body"])
-            print(self.neighbors)
+            #print(msg["body"])
             message = get_dict(msg["body"])
             message_type = message['type']
             if message_type == 'message':
                 if message['to'] != self.jid:
                     for neighbor in self.neighbors:
                         # enviar a todos los vecinos que no sean el origen, que no sea el vecino que mando el ultimo menasje y que no sea el vecino que creo el mensaje
-                        print(neighbor[0])
-                        print(message['from'])
-                        print(message['origin'])
-                        print(message['hops'])
-                        print("****")
+                        #print(neighbor[0])
+                        #print(message['from'])
+                        #print(message['origin'])
+                        #print(message['hops'])
+                        #print("****")
                         
                         if (
                             message['from'] != neighbor[0] and
@@ -41,7 +40,7 @@ class UserFlooding(my_xmpp_client):
                             self.send_individual_message(message['to'],message["msg"],message['hops']-1,message['origin'],neighbor[0],neighbor[1])
                         
                 else:
-                    print(message)
+                    print(message['origin'],": ",message['msg'])
         else:
             # Error
             print('Error')
