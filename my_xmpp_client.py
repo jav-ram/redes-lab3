@@ -65,9 +65,9 @@ class my_xmpp_client(slixmpp.ClientXMPP):
         closest,
         distance
     ):
-        print("enviando mensaje", closest, distance)
+        #print("enviando mensaje", closest, distance)
         #time.sleep(distance)
-        print("mensaje enviado", closest, distance)
+        #print("mensaje enviado", closest, distance)
         json_msg = make_msg_json(
             origin=origin,
             me=self.jid,
@@ -95,5 +95,5 @@ class my_xmpp_client(slixmpp.ClientXMPP):
             for neighbor in self.neighbors:
                 # mandar a todos los vecinos que no sean yo
                 if (self.jid != neighbor[0]):
-                    self.send_individual_message(to + "@alumchat.xyz", mbody, 50, self.jid, neighbor[0], neighbor[1])
+                    self.send_individual_message(to + "@alumchat.xyz", mbody, 10, self.jid, neighbor[0], neighbor[1])
                     

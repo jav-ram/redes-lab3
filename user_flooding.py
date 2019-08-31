@@ -20,6 +20,7 @@ class UserFlooding(my_xmpp_client):
         if msg['type'] in ('normal', 'chat'):
             # parceo string to json
             #print(msg["body"])
+            #print(self.jid)
             message = get_dict(msg["body"])
             message_type = message['type']
             if message_type == 'message':
@@ -35,7 +36,7 @@ class UserFlooding(my_xmpp_client):
                         if (
                             message['from'] != neighbor[0] and
                             message['origin'] != neighbor[0] and 
-                            message['hops'] != 0
+                            message['hops'] != '0'
                         ):
                             self.send_individual_message(message['to'],message["msg"],message['hops']-1,message['origin'],neighbor[0],neighbor[1])
                         
